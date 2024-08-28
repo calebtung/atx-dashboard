@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DASHboard: donations and operating expenses</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+    }
+    header {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .logo {
+        height: 60px; /* Adjust size as needed */
+        margin-right: 20px;
+    }
+    h1, h2 {
+        text-align: center;
+        color: #333;
+        margin-top: 20px; /* Adjusted margin for header */
+    }
+    .flex-container, .button-container, .photo-message-container {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px auto;
+        max-width: 80%;
+    }
+
+    .button-container {
+        max-width: 30%;
+    }
+
+    .photo-message-container {
+        max-width: 70%;
+        font-family: 'Roboto Condensed', sans-serif;
+        align-items: center;
+        text-align: center;
+        background-color: #fff; /* Light background for the message */
+        border: 2px solid #4CAF50; /* Green border to match the button */
+        padding: 20px;
+        border-radius: 10px; /* Rounded corners for the border */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+    
+    }
+    .summary-box {
+        flex: 1;
+        padding: 20px;
+        margin: 0 10px;
+        background-color: #e9ecef;
+        text-align: center;
+        font-size: 1.2em;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    img.photographer {
+        width: 150px; /* Adjust size as needed */
+        height: 150px;
+        border-radius: 50%; /* Circular photo */
+        margin-right: 30px;
+    }
+    table {
+        width: 80%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        display: none; /* Initially hide all monthly tables */
+    }
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    th {
+        background-color: #e9ecef;
+    }
+    caption {
+        font-size: 1.5em;
+        margin: 10px;
+        font-weight: bold;
+    }
+    .visible {
+        display: table; /* Show table when this class is added */
+    }
+
+    button {
+        font-family: 'Roboto Condensed', sans-serif;
+        padding: 15px 30px;
+        font-size: 18px;
+        cursor: pointer;
+        outline: none;
+        background-color: #4CAF50; /* Green background */
+        color: white; /* White text */
+        border: none;
+        border-radius: 5px;
+        margin: 20px 0; /* Space above and below the button */
+    }
+    button:hover {
+        background-color: #45a049; /* Slightly darker green on hover */
+    }
+
+        /* Smaller buttons for Left and Right navigation */
+    .nav-button {
+        padding: 10px 20px;
+        font-size: 0.8rem; /* Smaller font size */
+    }
+
+    /* Responsive adjustments for mobile devices */
+    @media (max-width: 768px) {
+        .flex-container {
+            flex-direction: column;
+        }
+        .summary-box {
+            margin: 10px 0; /* Adjust margin for stacked layout */
+        }
+        .photo-message-container {
+            flex-direction: column;
+            max-width: 90%;
+        }
+        img.photographer {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+        }
+        .button-container {
+            max-width: 50%;
+        }
+
+        .nav-button {
+            padding: 10px 10px;
+            margin: 10px;
+        }
+    }
+</style>
+<script>
+    let currentMonthIndex = 0;
+    const months = ["January", "February", "March"];
+
+    function switchMonth(direction) {
+        currentMonthIndex += direction;
+        if (currentMonthIndex >= months.length) {
+            currentMonthIndex = 0;
+        } else if (currentMonthIndex < 0) {
+            currentMonthIndex = months.length - 1;
+        }
+        updateVisibleTable();
+    }
+
+    function updateVisibleTable() {
+        const tables = document.querySelectorAll('.monthly');
+        tables.forEach(table => table.classList.remove('visible'));
+        document.getElementById(months[currentMonthIndex]).classList.add('visible');
+    }
+
+    window.onload = updateVisibleTable; // Initial setup to show the first month
+</script>
+</head>
+<body>
+<header>
+    <img src="DASH_ATX_Documenting_Austin_Streets_Homeless_Logo.jpg" alt="Company Logo" class="logo">
+    <h1>DASHboard</h1>
+</header>
+
+<section class="photo-message-container">
+    <img src="Jamie_Hammonds_DASH.jpg" alt="Photographer Headshot" class="photographer">
+    <p>Huge THANK YOU to all the amazing Austinites supporting DASH's journalism and our mission to help the homeless in our city! If you appreciate what we do, we'd be grateful for any donation. Every little bit helps! In the meantime, here is an overview of how we're using the money from our supporters. Thanks! -Jamie</p>
+</section>
+
+<section class="button-container" style="justify-content: center;">
+    <button onclick="window.location.href='https://your-donation-link.com'">Donate</button>
+</section>
+
+<section class="flex-container">
+    <div class="summary-box">
+        <h2>2024 Donations YTD: $1519</h2>
+    </div>
+    <div class="summary-box">
+        <h2>2024 Expenses YTD: $1850</h2>
+    </div>
+</section>
+
+
+
+<section>
+    <table id="January" class="monthly">
+        <caption>January 2024 Donations ($419)</caption>
+        <thead>
+            <tr>
+                <th>Donor Name</th>
+                <th>Amount Contributed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Anonymous</td>
+                <td>$100</td>
+            </tr>
+            <tr>
+                <td>Jane Smith</td>
+                <td>$150</td>
+            </tr>
+            <tr>
+                <td>Roger Victor</td>
+                <td>$69</td>
+            </tr>
+            <tr>
+                <td>Anonymous</td>
+                <td>$100</td>
+            </tr>
+        </tbody>
+    </table>
+    <table id="February" class="monthly">
+        <caption>February 2024 Donations ($450)</caption>
+        <thead>
+            <tr>
+                <th>Donor Name</th>
+                <th>Amount Contributed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Alice Johnson</td>
+                <td>$200</td>
+            </tr>
+            <tr>
+                <td>Bob Lee</td>
+                <td>$250</td>
+            </tr>
+        </tbody>
+    </table>
+    <table id="March" class="monthly">
+        <caption>March 2024 Donations ($650)</caption>
+        <thead>
+            <tr>
+                <th>Donor Name</th>
+                <th>Amount Contributed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Clara Oswald</td>
+                <td>$300</td>
+            </tr>
+            <tr>
+                <td>Danny Pink</td>
+                <td>$350</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section class="button-container">
+    <button class="nav-button" onclick="switchMonth(-1)">Previous Month</button>
+    <button class="nav-button" onclick="switchMonth(1)">Next Month</button>
+</section>
+
+<section>
+    <table class="visible"> <!-- Always visible -->
+        <caption>DASH Operating Costs</caption>
+        <thead>
+            <tr>
+                <th>Expense</th>
+                <th>Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Phone for livestreaming (Google Pixel)</td>
+                <td>$700</td>
+            </tr>
+            <tr>
+                <td>Water bottles to hand out to homeless</td>
+                <td>$300</td>
+            </tr>
+            <tr>
+                <td>Fuel for van</td>
+                <td>$600</td>
+            </tr>
+            <tr>
+                <td>Monthly Starlink Internet subscription</td>
+                <td>$350</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+</body>
+</html>
