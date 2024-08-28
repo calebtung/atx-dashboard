@@ -56,14 +56,14 @@ jobs:
           HUGO_ENVIRONMENT: production
           TZ: America/Chicago
         run: |
-          hugo \
+          cd ./hugo-site/ && hugo \
             --gc \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"          
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: ./hugo-site/public/
 
   # Deployment job
   deploy:
