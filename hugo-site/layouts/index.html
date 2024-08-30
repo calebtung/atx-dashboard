@@ -109,7 +109,7 @@
         background-color: #45a049; /* Slightly darker green on hover */
     }
 
-        /* Smaller buttons for Left and Right navigation */
+    /* Smaller buttons for Left and Right navigation */
     .nav-button {
         padding: 10px 20px;
         font-size: 0.8rem; /* Smaller font size */
@@ -145,15 +145,122 @@
     }
 </style>
 <script>
+    const YEAR = "2024";
+    const MONTHS = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
+    const DONORS_CSV_PATH = "/upload_csvs/Donors.csv";
+    const ADVERTISERS_CSV_PATH = "upload_csvs/Expenses.csv";
+
+    async function getDonors(donorsCsvUrl) {
+        const response = await fetch(donorsCsvUrl);
+        const donorsCsv = await response.text();
+        const donorsCsvRows = donorsCsv.split('\n').slice(1); // Ignore first row
+        let monthsWithDonations = {};
+
+        donorsCsvRows.forEach(row => {
+            if (row.trim() != "") {
+                const [donationDate, donorName, donationAmount] = row.split(",");
+                if (donorName != "0" && donationAmount != "0"){
+                    const donationMonthNumber = parseInt(donationDate.split('/')[0]);
+                    const donationMonthName = MONTHS[donationMonthNumber];
+                    if (monthsWithDonations.hasOwnProperty(donationMonthName)){
+                        monthsWithDonations[donationMonthName].push([donorName, parseFloat(donationAmount)]);
+                    }
+                    else {
+                        monthsWithDonations[donationMonthName] = [[donorName, parseFloat(donationAmount)]];
+                    }
+                }
+            }
+        });
+
+        // Sort such that largest donations go first
+        for (let monthName in monthsWithDonations){
+            if (monthsWithDonations.hasOwnProperty(monthName)){
+                monthsWithDonations[monthName].sort((a, b) => {
+                    return b[1] - a[1];
+                })
+            }
+        }
+
+        return monthsWithDonations;
+    }
+
+    async function updateDomWithDonations(){
+        let monthsWithDonations = await getDonors(DONORS_CSV_PATH);
+        console.log(monthsWithDonations)
+
+        let donationsSectionElem = document.getElementById("donations-section");
+
+        let yearTotal = 0;
+
+        MONTHS.forEach(monthName => {
+            let monthTotal = 0;
+            let tableElem = document.createElement("table");
+            tableElem.id = monthName;
+            tableElem.classList.add("monthly")
+            donationsSectionElem.appendChild(tableElem);
+
+            let captionElem = document.createElement("caption");
+            tableElem.appendChild(captionElem);
+
+            let theadElem = document.createElement("thead");
+            tableElem.appendChild(theadElem);
+            let trElem = document.createElement("tr");
+            theadElem.appendChild(trElem);
+            let thElemDonorName = document.createElement("th");
+            thElemDonorName.textContent = "Donor Name";
+            trElem.appendChild(thElemDonorName);
+            let thElemAmountContributed = document.createElement("th");
+            thElemAmountContributed.textContent = "Amount Contributed";
+            trElem.appendChild(thElemAmountContributed)
+            
+            let tbodyElem = document.createElement("tbody");
+            tableElem.appendChild(tbodyElem);
+            
+            if (monthsWithDonations.hasOwnProperty(monthName)){
+                monthsWithDonations[monthName].forEach(([donorName, donationAmount]) => {
+                    let trElemDonation = document.createElement("tr");
+                    tbodyElem.appendChild(trElemDonation);
+                    let tdElemDonorName = document.createElement("td");
+                    tdElemDonorName.textContent = donorName;
+                    trElemDonation.appendChild(tdElemDonorName);
+                    let tdElemDonationAmount = document.createElement("td");
+                    tdElemDonationAmount.textContent = "$"+donationAmount.toFixed(2);
+                    trElemDonation.appendChild(tdElemDonationAmount);
+                    monthTotal += donationAmount;
+                })
+            }
+
+            captionElem.textContent = `${monthName} ${YEAR} Donations (\$${monthTotal.toFixed(2)})`;
+
+            yearTotal += monthTotal;
+        })
+
+        updateVisibleTable();
+
+        document.getElementById("donation-summary").textContent = `${YEAR} Donations YTD: \$${yearTotal.toFixed(2)}`;
+    }
+
     let currentMonthIndex = 0;
-    const months = ["January", "February", "March"];
 
     function switchMonth(direction) {
         currentMonthIndex += direction;
-        if (currentMonthIndex >= months.length) {
+        if (currentMonthIndex >= MONTHS.length) {
             currentMonthIndex = 0;
         } else if (currentMonthIndex < 0) {
-            currentMonthIndex = months.length - 1;
+            currentMonthIndex = MONTHS.length - 1;
         }
         updateVisibleTable();
     }
@@ -161,10 +268,10 @@
     function updateVisibleTable() {
         const tables = document.querySelectorAll('.monthly');
         tables.forEach(table => table.classList.remove('visible'));
-        document.getElementById(months[currentMonthIndex]).classList.add('visible');
+        document.getElementById(MONTHS[currentMonthIndex]).classList.add('visible');
     }
-
-    window.onload = updateVisibleTable; // Initial setup to show the first month
+    updateDomWithDonations();
+    window.onload = updateDomWithDonations; // Initial setup to show the first month
 </script>
 </head>
 <body>
@@ -185,7 +292,7 @@
 
 <section class="flex-container">
     <div class="summary-box">
-        <h2>2024 Donations YTD: $1519</h2>
+        <h2 id="donation-summary">2024 Donations YTD: $1519</h2>
     </div>
     <div class="summary-box">
         <h2>2024 Expenses YTD: $1850</h2>
@@ -194,8 +301,8 @@
 
 
 
-<section>
-    <table id="January" class="monthly">
+<section id="donations-section">
+    <!-- <table id="January" class="monthly">
         <caption>January 2024 Donations ($419)</caption>
         <thead>
             <tr>
@@ -259,7 +366,7 @@
                 <td>$350</td>
             </tr>
         </tbody>
-    </table>
+    </table> -->
 </section>
 
 <section class="button-container">
@@ -269,7 +376,7 @@
 
 <section>
     <table class="visible"> <!-- Always visible -->
-        <caption>DASH Operating Costs</caption>
+        <caption>2024 DASH Operating Costs YTD</caption>
         <thead>
             <tr>
                 <th>Expense</th>
