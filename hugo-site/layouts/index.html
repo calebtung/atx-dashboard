@@ -161,7 +161,7 @@
         "December"
     ];
     const DONORS_CSV_PATH = "/upload_csvs/Donors.csv";
-    const ADVERTISERS_CSV_PATH = "upload_csvs/Expenses.csv";
+    const EXPENSES_CSV_PATH = "upload_csvs/Expenses.csv";
 
     async function getDonors(donorsCsvUrl) {
         const response = await fetch(donorsCsvUrl);
@@ -173,7 +173,7 @@
             if (row.trim() != "") {
                 const [donationDate, donorName, donationAmount] = row.split(",");
                 if (donorName != "0" && donationAmount != "0"){
-                    const donationMonthNumber = parseInt(donationDate.split('/')[0]);
+                    const donationMonthNumber = parseInt(donationDate.split('/')[0])-1;
                     const donationMonthName = MONTHS[donationMonthNumber];
                     if (monthsWithDonations.hasOwnProperty(donationMonthName)){
                         monthsWithDonations[donationMonthName].push([donorName, parseFloat(donationAmount)]);
@@ -253,7 +253,76 @@
         document.getElementById("donation-summary").textContent = `${YEAR} Donations YTD: \$${yearTotal.toFixed(2)}`;
     }
 
-    let currentMonthIndex = 0;
+    async function getExpenses(expensesCsvUrl) {
+        const response = await fetch(expensesCsvUrl);
+        const expensesCsv = await response.text();
+        const expensesCsvRows = expensesCsv.split('\n').slice(1); // Ignore first row
+        let expenses = {};
+
+        expensesCsvRows.forEach(row => {
+            if (row.trim() != "") {
+                const [expenseDescription, expenseAmount] = row.split(",");
+                if (expenseDescription != "0" && expenseAmount != "0"){
+                    if (expenses.hasOwnProperty(expenseDescription)){
+                        expenses[expenseDescription] += parseFloat(expenseAmount);
+                    }
+                    else {
+                        expenses[expenseDescription] = parseFloat(expenseAmount);
+                    }
+                }
+            }
+        });
+
+        let listOfExpenses = Object.entries(expenses);
+
+        listOfExpenses.sort((a, b) => {
+            return b[1] - a[1];
+        });
+
+        return listOfExpenses;
+    }
+
+    async function updateDomWithExpenses(){
+        let yearTotal = 0;
+
+        let listOfExpenses = await getExpenses(EXPENSES_CSV_PATH);
+        let tableElem = document.getElementById("expenses-table");
+        
+        let captionElem = document.createElement("caption");
+        captionElem.textContent = `${YEAR} DASH Itemized Expenses`;
+        tableElem.appendChild(captionElem);
+
+        let theadElem = document.createElement("thead");
+        tableElem.appendChild(theadElem);
+        let trElem = document.createElement("tr");
+        theadElem.appendChild(trElem);
+        let thElemExpense = document.createElement("th");
+        thElemExpense.textContent = "Expense";
+        trElem.appendChild(thElemExpense);
+        let thElemCost = document.createElement("th");
+        thElemCost.textContent = "Cost";
+        trElem.appendChild(thElemCost);
+
+        let tbodyElem = document.createElement("tbody");
+        tableElem.appendChild(tbodyElem);
+
+        listOfExpenses.forEach(([expenseDescription, expenseAmount]) => {
+            let trElemExpense = document.createElement("tr");
+            tbodyElem.appendChild(trElemExpense);
+            let tdElemExpenseDescription = document.createElement("td");
+            tdElemExpenseDescription.textContent = expenseDescription;
+            trElemExpense.appendChild(tdElemExpenseDescription);
+            let tdElemExpenseAmount = document.createElement("td");
+            tdElemExpenseAmount.textContent = "$"+expenseAmount.toFixed(2);
+            trElemExpense.appendChild(tdElemExpenseAmount);
+            yearTotal += expenseAmount;
+        })
+
+        document.getElementById("expenses-summary").textContent = `${YEAR} Expenses YTD: \$${yearTotal.toFixed(2)}`;
+    }
+
+    let now = new Date();
+    let currentMonthIndex = now.getMonth();
 
     function switchMonth(direction) {
         currentMonthIndex += direction;
@@ -270,8 +339,13 @@
         tables.forEach(table => table.classList.remove('visible'));
         document.getElementById(MONTHS[currentMonthIndex]).classList.add('visible');
     }
-    updateDomWithDonations();
-    window.onload = updateDomWithDonations; // Initial setup to show the first month
+    
+    function updateDom(){
+        updateDomWithDonations();
+        updateDomWithExpenses();
+    }
+
+    window.onload = updateDom; // Initial setup to show the first month
 </script>
 </head>
 <body>
@@ -295,7 +369,7 @@
         <h2 id="donation-summary">2024 Donations YTD: $1519</h2>
     </div>
     <div class="summary-box">
-        <h2>2024 Expenses YTD: $1850</h2>
+        <h2 id="expenses-summary">2024 Expenses YTD: $1850</h2>
     </div>
 </section>
 
@@ -375,8 +449,8 @@
 </section>
 
 <section>
-    <table class="visible"> <!-- Always visible -->
-        <caption>2024 DASH Operating Costs YTD</caption>
+    <table id="expenses-table" class="visible"> <!-- Always visible -->
+        <!-- <caption>2024 DASH Operating Costs YTD</caption>
         <thead>
             <tr>
                 <th>Expense</th>
@@ -400,7 +474,7 @@
                 <td>Monthly Starlink Internet subscription</td>
                 <td>$350</td>
             </tr>
-        </tbody>
+        </tbody> -->
     </table>
 </section>
 
