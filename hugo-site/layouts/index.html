@@ -321,15 +321,15 @@
         document.getElementById("expenses-summary").textContent = `${YEAR} Expenses YTD: \$${yearTotal.toFixed(2)}`;
     }
 
-    let now = new Date();
-    let currentMonthIndex = now.getMonth();
+    let now = new Date().getMonth();
+    let currentMonthIndex = now;
 
     function switchMonth(direction) {
         currentMonthIndex += direction;
-        if (currentMonthIndex >= MONTHS.length) {
+        if (currentMonthIndex >= now) {
             currentMonthIndex = 0;
         } else if (currentMonthIndex < 0) {
-            currentMonthIndex = MONTHS.length - 1;
+            currentMonthIndex = now;
         }
         updateVisibleTable();
     }
