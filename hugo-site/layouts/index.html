@@ -289,7 +289,7 @@
         let tableElem = document.getElementById("expenses-table");
         
         let captionElem = document.createElement("caption");
-        captionElem.textContent = `${YEAR} DASH Itemized Expenses`;
+        captionElem.textContent = `${YEAR} DASH Itemized Expenses YTD`;
         tableElem.appendChild(captionElem);
 
         let theadElem = document.createElement("thead");
@@ -447,6 +447,7 @@
     <button class="nav-button" onclick="switchMonth(-1)">Previous Month</button>
     <button class="nav-button" onclick="switchMonth(1)">Next Month</button>
 </section>
+
 
 <section>
     <table id="expenses-table" class="visible"> <!-- Always visible -->
