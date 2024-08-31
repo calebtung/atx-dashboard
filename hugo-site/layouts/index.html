@@ -160,8 +160,8 @@
         "November",
         "December"
     ];
-    const DONORS_CSV_PATH = "/upload_csvs/Donors.csv";
-    const EXPENSES_CSV_PATH = "upload_csvs/Expenses.csv";
+    const DONORS_CSV_PATH = "/upload_csvs/DASHboard - DonorsExport.csv";
+    const EXPENSES_CSV_PATH = "upload_csvs/DASHboard - ExpensesExport.csv";
 
     async function getDonors(donorsCsvUrl) {
         const response = await fetch(donorsCsvUrl);
@@ -175,11 +175,12 @@
                 if (donorName != "0" && donationAmount != "0"){
                     const donationMonthNumber = parseInt(donationDate.split('/')[0])-1;
                     const donationMonthName = MONTHS[donationMonthNumber];
+                    const donationAmountAsAFloat = parseFloat(donationAmount);
                     if (monthsWithDonations.hasOwnProperty(donationMonthName)){
-                        monthsWithDonations[donationMonthName].push([donorName, parseFloat(donationAmount)]);
+                        monthsWithDonations[donationMonthName].push([donorName, donationAmountAsAFloat]);
                     }
                     else {
-                        monthsWithDonations[donationMonthName] = [[donorName, parseFloat(donationAmount)]];
+                        monthsWithDonations[donationMonthName] = [[donorName, donationAmountAsAFloat]];
                     }
                 }
             }
@@ -199,7 +200,6 @@
 
     async function updateDomWithDonations(){
         let monthsWithDonations = await getDonors(DONORS_CSV_PATH);
-        console.log(monthsWithDonations)
 
         let donationsSectionElem = document.getElementById("donations-section");
 
@@ -262,12 +262,13 @@
         expensesCsvRows.forEach(row => {
             if (row.trim() != "") {
                 const [expenseDescription, expenseAmount] = row.split(",");
-                if (expenseDescription != "0" && expenseAmount != "0"){
+                if (expenseDescription != "0" && expenseDescription.trim() != "" && expenseAmount != "0"){
+                    const expenseAmountAsAFloat = parseFloat(expenseAmount);
                     if (expenses.hasOwnProperty(expenseDescription)){
-                        expenses[expenseDescription] += parseFloat(expenseAmount);
+                        expenses[expenseDescription] += expenseAmountAsAFloat;
                     }
                     else {
-                        expenses[expenseDescription] = parseFloat(expenseAmount);
+                        expenses[expenseDescription] = expenseAmountAsAFloat;
                     }
                 }
             }
@@ -326,7 +327,7 @@
 
     function switchMonth(direction) {
         currentMonthIndex += direction;
-        if (currentMonthIndex >= now) {
+        if (currentMonthIndex > now) {
             currentMonthIndex = 0;
         } else if (currentMonthIndex < 0) {
             currentMonthIndex = now;
