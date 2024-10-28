@@ -87,7 +87,21 @@ async function updateDomWithDonations(){
                 let trElemDonation = document.createElement("tr");
                 tbodyElem.appendChild(trElemDonation);
                 let tdElemDonorName = document.createElement("td");
-                tdElemDonorName.textContent = donorName;
+
+                if (donorName.startsWith("@")){
+                    let aElemLinkedDonorName = document.createElement("a");
+                   
+                    aElemLinkedDonorName.href = "https://x.com/" + donorName.substring(1);
+                    aElemLinkedDonorName.textContent = donorName;
+                    
+                    // Set target to open in a new tab/window
+                    aElemLinkedDonorName.setAttribute("target", "_blank");
+                    tdElemDonorName.appendChild(aElemLinkedDonorName);
+                }
+                else{
+                    tdElemDonorName.textContent = donorName;
+                }
+                
                 trElemDonation.appendChild(tdElemDonorName);
                 let tdElemDonationAmount = document.createElement("td");
                 tdElemDonationAmount.textContent = "$"+donationAmount.toFixed(2);
